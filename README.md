@@ -2,7 +2,7 @@
 
 统一小红书首页帖子卡片高度，使其左右对齐。
 
-![效果预览](screenshot.jpg)
+![效果预览](https://raw.githubusercontent.com/wrh1024/xiaohongshu-align/master/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_17-4-2026_2027_www.xiaohongshu.com.jpeg)
 
 ## 功能
 
@@ -36,12 +36,6 @@
 ```bash
 python test_align.py
 ```
-
-## 截图预览
-
-![小红书首页帖子对齐效果](screenshot.jpg)
-
-> 截图位置：`C:\Users\wrh\OneDrive\opencodee\小红书首页帖子对齐\屏幕截图_17-4-2026_2027_www.xiaohongshu.com.jpeg`
 
 ## License
 

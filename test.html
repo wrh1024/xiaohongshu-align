@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书首页帖子对齐测试</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e8f4ff;
+            border-radius: 8px;
+        }
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .post-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .post-card .image-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        .post-card[data-post-id="1"] .image-wrapper { height: 140px; }
+        .post-card[data-post-id="2"] .image-wrapper { height: 200px; }
+        .post-card[data-post-id="3"] .image-wrapper { height: 120px; }
+        .post-card[data-post-id="4"] .image-wrapper { height: 180px; }
+        .post-card[data-post-id="5"] .image-wrapper { height: 100px; }
+        .post-card[data-post-id="6"] .image-wrapper { height: 160px; }
+        .post-card[data-post-id="7"] .image-wrapper { height: 190px; }
+        .post-card[data-post-id="8"] .image-wrapper { height: 150px; }
+        .post-card .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post-card .content {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .post-card .title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .post-card .meta {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .post-card .avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+        .post-card .author {
+            font-size: 12px;
+            color: #999;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .post-card .likes {
+            font-size: 12px;
+            color: #ff4d4f;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .controls button {
+            padding: 10px 24px;
+            margin: 0 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .controls .apply-btn {
+            background: #ff2442;
+            color: white;
+        }
+        .controls .apply-btn:hover {
+            background: #ff4d4f;
+        }
+        .controls .reset-btn {
+            background: #666;
+            color: white;
+        }
+        .controls .reset-btn:hover {
+            background: #888;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>小红书首页帖子对齐测试</h1>
+    <div class="test-info">
+        <p>测试目标：确保所有帖子卡片高度一致，左右对齐</p>
+        <p>当前状态：<span id="status-text">未应用对齐</span></p>
+    </div>
+    <div class="controls">
+        <button class="apply-btn" onclick="applyAlignment()">应用对齐</button>
+        <button class="reset-btn" onclick="resetAlignment()">重置</button>
+        <button class="apply-btn" onclick="runTests()">运行测试</button>
+    </div>
+    <div id="status-area"></div>
+    <div class="posts-grid" id="posts-container">
+    </div>
+
+    <script>
+    const testPosts = [
+        { id: 1, title: '新中式美甲分享', author: '美甲达人', likes: '1.2万', imgH: 300, imgW: 300 },
+        { id: 2, title: '家常菜做法简单又好吃', author: '厨房小白', likes: '3.4万', imgH: 400, imgW: 300 },
+        { id: 3, title: '这个标题非常长需要测试多行省略号显示效果是否正常以及文本截断功能是否工作', author: '测试用户1号', likes: '5千', imgH: 300, imgW: 400 },
+        { id: 4, title: '穿搭分享日常', author: '时尚博主小美', likes: '8.9万', imgH: 350, imgW: 350 },
+        { id: 5, title: '简短的标题', author: '用户A', likes: '234', imgH: 300, imgW: 300 },
+        { id: 6, title: '旅游景点推荐周末好去处推荐给大家', author: '旅行家小明', likes: '2.1万', imgH: 300, imgW: 300 },
+        { id: 7, title: '美食探店这家店真的很不错推荐指数五颗星', author: '吃货一枚', likes: '6.7万', imgH: 320, imgW: 300 },
+        { id: 8, title: '护肤心得分享', author: '护肤达人', likes: '4.5万', imgH: 300, imgW: 340 },
+    ];
+
+    function generatePosts() {
+        const container = document.getElementById('posts-container');
+        container.innerHTML = '';
+        const heights = [280, 350, 220, 310, 250, 290, 380, 260];
+        testPosts.forEach((post, index) => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            card.dataset.postId = post.id;
+            card.style.height = heights[index] + 'px';
+            card.innerHTML = `
+                <div class="image-wrapper" style="height: ${Math.floor(heights[index] * 0.6)}px; flex-shrink: 0;">
+                    <img src="https://picsum.photos/${post.imgW}/${post.imgH}?random=${post.id}" alt="Post ${post.id}">
+                </div>
+                <div class="content">
+                    <div class="title">${post.title}</div>
+                    <div class="meta">
+                        <img class="avatar" src="https://i.pravatar.cc/40?u=${post.id}" alt="Avatar">
+                        <span class="author">${post.author}</span>
+                        <span class="likes">❤ ${post.likes}</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function showStatus(message, type) {
+        const statusArea = document.getElementById('status-area');
+        statusArea.innerHTML = `<div class="status ${type}">${message}</div>`;
+        document.getElementById('status-text').textContent = type === 'success' ? '已应用对齐' : '重置';
+    }
+
+    function applyAlignment() {
+        if (typeof window.alignPostHeights === 'function') {
+            window.alignPostHeights();
+            showStatus('对齐已应用!', 'success');
+        } else {
+            showStatus('对齐脚本未加载', 'error');
+        }
+    }
+
+    function resetAlignment() {
+        const heights = [280, 350, 220, 310, 250, 290, 380, 260];
+        document.querySelectorAll('.post-card').forEach((card, index) => {
+            const originalHeight = heights[index % heights.length];
+            card.style.height = originalHeight + 'px';
+            card.style.display = '';
+            card.style.flexDirection = '';
+            const imgWrapper = card.querySelector('.image-wrapper');
+            if (imgWrapper) {
+                imgWrapper.style.height = Math.floor(originalHeight * 0.6) + 'px';
+            }
+        });
+        showStatus('已重置', 'success');
+    }
+
+    window.resetToOriginal = resetAlignment;
+
+    function runTests() {
+        const results = [];
+        const posts = document.querySelectorAll('.post-card');
+
+        posts[0].style.height = 'auto';
+        posts[1].style.height = 'auto';
+        posts[2].style.height = 'auto';
+        applyAlignment();
+
+        setTimeout(() => {
+            const heights = Array.from(posts).map(p => p.offsetHeight);
+            const allSameHeight = heights.every(h => h === heights[0]);
+
+            results.push({
+                name: '高度一致性',
+                pass: allSameHeight,
+                detail: `高度: ${heights.join('px, ')}px ${allSameHeight ? '✓' : '✗'}`
+            });
+
+            const grid = document.querySelector('.posts-grid');
+            const firstRow = Array.from(posts).filter(p => {
+                const rect = p.getBoundingClientRect();
+                return rect.top < grid.getBoundingClientRect().bottom;
+            });
+            const firstRowHeights = firstRow.map(p => p.offsetHeight);
+            const rowAligned = firstRowHeights.every(h => h === firstRowHeights[0]);
+
+            results.push({
+                name: '同行对齐',
+                pass: rowAligned,
+                detail: `第一行高度一致: ${rowAligned ? '✓' : '✗'}`
+            });
+
+            const hasOverflow = Array.from(posts).some(p => {
+                const content = p.querySelector('.content');
+                const title = p.querySelector('.title');
+                return content && title && content.scrollHeight > content.clientHeight;
+            });
+
+            results.push({
+                name: '溢出处理',
+                pass: !hasOverflow,
+                detail: hasOverflow ? '存在溢出 ✗' : '无溢出 ✓'
+            });
+
+            results.forEach(r => {
+                console.log(`${r.pass ? '✓' : '✗'} ${r.name}: ${r.detail}`);
+            });
+
+            const allPass = results.every(r => r.pass);
+            showStatus(
+                `测试完成: ${results.filter(r => r.pass).length}/${results.length} 通过` +
+                (allPass ? ' - 全部通过!' : ` - ${results.filter(r => !r.pass).map(r => r.name).join(', ')} 失败`),
+                allPass ? 'success' : 'error'
+            );
+        }, 500);
+    }
+
+    generatePosts();
+    </script>
+    <script src="xiaohongshu-align.js"></script>
+</body>
+</html>
